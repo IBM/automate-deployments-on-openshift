@@ -1,4 +1,4 @@
-# [Automate OpenShift Deployments using Tekton CI and ArgoCD]
+# Automate OpenShift Deployments using Tekton CI and ArgoCD
 
 In this code pattern, we will [create something] using [technologies] and [components]. [Explain briefly how things work]. [Give acknowledgements to others if necessary]
 
