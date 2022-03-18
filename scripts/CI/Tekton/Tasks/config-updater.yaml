@@ -1,0 +1,72 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: config-updater
+spec:
+  params:
+    - description: GitHub source code repository URL
+      name: gitUrl
+      type: string
+    - description: GitHub branch
+      name: gitRevision
+      type: string
+    - description: Reference of the image produced by buildah
+      name: IMAGE
+      type: string
+    - description: Reference of the image tag produced by buildah
+      name: TAG
+      type: string
+  steps:
+    - image: >-
+        registry.redhat.io/openshift-pipelines/pipelines-git-init-rhel8:v1.6.2-21
+      name: git-clone
+      resources: {}
+      script: |
+        #!/usr/bin/env sh
+
+        echo "------Cloning gitops repo------"
+        git clone -b $(params.gitRevision) "$(params.gitUrl)" ./ || exit 1
+        echo "-------------------------------"
+      workingDir: $(workspaces.doc-source.path)
+    - image: 'python:3.8.5-slim'
+      name: update-image-tag
+      resources: {}
+      script: >
+        #!/usr/bin/env sh
+
+        echo "------Updating Image Tag------"
+
+        pip install pyyaml || exit 1
+
+        python -c 'import yaml;f=open("values.yaml");y=yaml.safe_load(f);y["image"]["repository"]="'$(params.IMAGE)'";f.close();f=open("values.yaml","w");yaml.dump(y,f);f.close()' || exit 1
+
+        python -c 'import yaml;f=open("values.yaml");y=yaml.safe_load(f);y["image"]["tag"]="'$(params.TAG)'";f.close();f=open("values.yaml","w");yaml.dump(y,f);f.close()' || exit 1
+
+        echo "-------------------------------"
+      workingDir: $(workspaces.doc-source.path)
+    - image: >-
+        registry.redhat.io/openshift-pipelines/pipelines-git-init-rhel8:v1.6.2-21
+      name: git-push
+      resources: {}
+      script: >
+        #!/usr/bin/env sh
+
+
+        echo "------Pushing the updates------"
+
+        git config --global user.email "tekton@tekton.dev"
+
+        git config --global user.name "Tekton Pipeline"
+
+        git branch 
+
+        git add . || exit 1
+
+        git commit -m "Updated with image $(params.IMAGE):$(params.TAG)" || exit 1
+
+        git push origin $(params.gitRevision) || exit 1
+
+        echo "-------------------------------"
+      workingDir: $(workspaces.doc-source.path)
+  workspaces:
+    - name: doc-source

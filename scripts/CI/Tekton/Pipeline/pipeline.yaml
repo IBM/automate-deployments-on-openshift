@@ -1,0 +1,94 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: gitops-build-pipeline
+spec:
+  params:
+    - name: git-url
+      type: string
+      description: GitHub source code repository URL
+    - name: git-rev
+      type: string
+      description: GitHub branch
+    - name: image-name
+      type: string
+      description: Reference of the image produced by buildah
+    - name: image-tag
+      type: string
+      description: Reference of the image tag produced by buildah
+    - name: gitops-url
+      type: string
+      description: GitHub config files repository URL
+  tasks:
+    - name: app-setup
+      params:
+        - name: gitUrl
+          value: $(params.git-url)
+        - name: gitRevision
+          value: $(params.git-rev)
+      taskRef:
+        kind: Task
+        name: app-setup
+    - name: container-image-builder
+      params:
+        - name: gitUrl
+          value: $(params.git-url)
+        - name: gitRevision
+          value: $(params.git-rev)
+        - name: IMAGE
+          value: '$(params.image-name):$(params.image-tag)'
+        - name: BUILDER_IMAGE
+          value: >-
+            registry.redhat.io/rhel8/buildah@sha256:e19cf23d5f1e0608f5a897f0a50448beb9f8387031cca49c7487ec71bd91c4d3
+        - name: STORAGE_DRIVER
+          value: vfs
+        - name: DOCKERFILE
+          value: ./Dockerfile
+        - name: CONTEXT
+          value: .
+        - name: TLSVERIFY
+          value: 'true'
+        - name: FORMAT
+          value: oci
+      runAfter:
+        - app-nodejs-build
+      taskRef:
+        kind: Task
+        name: container-image-builder
+      workspaces:
+        - name: source
+          workspace: doc-source
+    - name: config-updater
+      params:
+        - name: gitUrl
+          value: $(params.gitops-url)
+        - name: gitRevision
+          value: $(params.git-rev)
+        - name: IMAGE
+          value: $(params.image-name)
+        - name: TAG
+          value: $(params.image-tag)
+      runAfter:
+        - container-image-builder
+      taskRef:
+        kind: Task
+        name: config-updater
+      workspaces:
+        - name: doc-source
+          workspace: doc-source
+    - name: app-nodejs-build
+      params:
+        - name: gitUrl
+          value: $(params.git-url)
+        - name: gitRevision
+          value: $(params.git-rev)
+      runAfter:
+        - app-setup
+      taskRef:
+        kind: Task
+        name: app-nodejs-build
+      workspaces:
+        - name: doc-source
+          workspace: doc-source
+  workspaces:
+    - name: doc-source

@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: temperature-converter-app
+spec:
+  destination:
+    name: ''
+    namespace: app-deployments
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: .
+    repoURL: https://github.com/IBM/sample-temperature-converter-gitops.git
+    targetRevision: HEAD
+  syncPolicy:
+    syncOptions:
+    - PruneLast=true
+    - Validate=false

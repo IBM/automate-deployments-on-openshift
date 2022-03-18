@@ -1,0 +1,29 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: app-setup
+spec:
+  params:
+    - description: GitHub source code repository URL
+      name: gitUrl
+      type: string
+    - description: GitHub branch
+      name: gitRevision
+      type: string
+  steps:
+    - image: >-
+        registry.redhat.io/openshift-pipelines/pipelines-git-init-rhel8@sha256:da1aedf0b17f2b9dd2a46edc93ff1c0582989414b902a28cd79bad8a035c9ea4
+      name: git-clone
+      resources: {}
+      script: |
+        #!/usr/bin/env sh
+
+        echo "------Checking access to GitHub------"
+        git config --global user.email "tekton@tekton.dev"
+        git config --global user.name "Tekton Pipeline"
+        git init
+        git remote add origin "$(params.gitUrl)" || exit 1
+        git fetch origin "$(params.gitRevision)" || exit 1
+        git branch
+
+        echo "-------------------------------------"
