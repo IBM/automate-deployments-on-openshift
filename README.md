@@ -171,19 +171,19 @@ You will learn how to deploy tekton tasks, pipelines and secrets using the `tkn`
 
     Files|Kind|Description
     --|--|--
-    `Tasks/app-setup.yaml`|Tekton Task|This task checkes if the GitHub repository is accessible.
-    `Tasks/app-nodejs-build.yaml`|Tekton Task|This task builds the NodeJS application and runs the test cases.
-    `Tasks/container-image-builder.yaml`|Tekton Task|This task builds the container image and pushes it to the container registry.
-    `Tasks/config-updater.yaml`|Tekton Task| This task updates the configuration files in the GitOps Repository.
-    `Secrets/container-registry-secrets.yaml`|Tekton Secret| This is a secret containing DockerHub credentials.
-    `Secrets/github-secrets.yaml`|Tekton Secret| This is a secret containing GitHub credentials.
-    `Pipeline/pipeline.yaml`|Tekton Pipeline| This is the Tekton pipeline definition.
+    Tasks/app-setup.yaml|Tekton Task|This task checkes if the GitHub repository is accessible.
+    Tasks/app-nodejs-build.yaml|Tekton Task|This task builds the NodeJS application and runs the test cases.
+    Tasks/container-image-builder.yaml|Tekton Task|This task builds the container image and pushes it to the container registry.
+    Tasks/config-updater.yaml|Tekton Task| This task updates the configuration files in the GitOps Repository.
+    Secrets/container-registry-secrets.yaml|Tekton Secret| This is a secret containing DockerHub credentials.
+    Secrets/github-secrets.yaml|Tekton Secret| This is a secret containing GitHub credentials.
+    Pipeline/pipeline.yaml|Tekton Pipeline| This is the Tekton pipeline definition.
 
 * The `scripts/CD/GitOps` directory consists of the Argo CD deployment config files.
     Files|Kind|Description
     --|--|--
-    `ArgoCD/application.yaml`|Argo CD Application| This is the Argo CD application definition.
-    `RBAC/rbac.yaml`|Argo CD RBAC| This is the Argo CD RBAC definition.
+    ArgoCD/application.yaml|Argo CD Application| This is the Argo CD application definition.
+    RBAC/rbac.yaml|Argo CD RBAC| This is the Argo CD RBAC definition.
 
 * The `scripts/setup-CI.sh` and `scripts/delete-CI.sh` scripts are used to setup and delete the CI environment.
 
