@@ -27,6 +27,13 @@ When you have completed this code pattern, you will understand how to:
 Coming Soon!
 <!-- [![video](http://img.youtube.com/vi/Jxi7U7VOMYg/0.jpg)](https://www.youtube.com/watch?v=Jxi7U7VOMYg) -->
 
+# Pre-Requisites
+
+1. Create an [OpenShift Cluster on IBM Cloud](https://cloud.ibm.com/kubernetes/catalog/create?platformType=openshift) or [Create a Red Hat OpenShift trial cluster on AWS](https://developer.ibm.com/tutorials/create-a-trial-red-hat-openshift-cluster-on-amazon-web-services/).
+1. [OC CLI](https://docs.openshift.com/container-platform/4.6/cli_reference/openshift_cli/getting-started-cli.html): Download and Install OpenShift Command Line Interface tool.
+1. [Tekton CLI](https://tekton.dev/docs/cli/#installation): Download and Install Tekton Command Line Interface tool.
+1. [Argo CD CLI](https://argo-cd.readthedocs.io/en/stable/cli_installation): Download and Install Argo CD Command Line Interface tool.
+
 # Steps
 
 1. [Setup Repositories](#1-setup-repositories)
@@ -340,7 +347,148 @@ At this point you have successfully deployed OpenShift GitOps on your OpenShift 
 
 ### 3.2. Create ArgoCD Application
 
+You will learn how to deploy the Argo CD application on your OpenShift cluster. The Application CRD is the Kubernetes resource object representing a deployed application instance in an environment. It is defined by two key pieces of information:
+
+* `source` reference to the desired state in Git (repository, revision, path, environment)
+
+* `destination` reference to the target cluster and namespace.
+
+* You will be referring to the `automate-deployments-on-openshift/scripts` directory from the cloned repository.
+
+* The `scripts/CD/GitOps` directory consists of the Argo CD deployment config files.
+    Files|Kind|Description
+    --|--|--
+    **ArgoCD/application.yaml**|Argo CD Application| This is the Argo CD application definition.
+
+* The `scripts/setup-CI.sh` and `scripts/delete-CI.sh` scripts are used to setup and delete the CI environment.
+
+* The `scripts/setup-GitOps.sh` and `scripts/delete-GitOps.sh` scripts are used to setup and delete the Application and its deployment configs on the cluster using the Argo CD Application CRD.
+
+* Before creating the Argo CD application, you will need to export some environment variables that will be used by the shell script. Following are the environment variables that you need to export:
+
+    Environment Variables|Description
+    --|--
+    GITOPS_URL|The Git URL of the GitOps repository created in [Step 1.2](#12-setup-gitops-repository).
+    GIT_BRANCH|The Git branch of the GitOps repository usually it is **Main**.
+    ARGOSERVER|The URL of the Argo CD server. To get this value, you can use the `oc get route -n openshift-gitops openshift-gitops-server -o jsonpath='{.spec.host}'` command.
+    ARGOPASSWORD|The password of the Argo CD admin user. To get this value, you can refer the [Logging in to the Argo CD instance by using your OpenShift credentials](https://docs.openshift.com/container-platform/4.7/cicd/gitops/configuring_argo_cd_to_recursively_sync_a_git_repository_with_your_application/configuring-an-openshift-cluster-by-deploying-an-application-with-cluster-configurations.html#logging-in-to-the-argo-cd-instance-by-using-your-openshift-credentials_configuring-an-openshift-cluster-by-deploying-an-application-with-cluster-configurations) documentation
+
+* Export these variables, In terminal, run:
+
+    ```bash
+    export GITOPS_URL=your-gitops-url
+    export GIT_BRANCH=your-git-branch
+    export ARGOSERVER=$(oc get route -n openshift-gitops openshift-gitops-server -o jsonpath='{.spec.host}')
+    export CONTAINER_IMAGE_TAG=your-container-image-tag
+    ```
+
+>Note: You have to replace the values of the environment variables with the values that you obtained from the above steps.
+
+* Navigate to the `scripts/` directory and run the `setup-CD.sh` script. In terminal, run:
+
+    ```bash
+    cd scripts/
+    chmod +x setup-CD.sh
+    ./setup-CD.sh
+    ```
+
+* You should see output similar to the following:
+
+    ```
+    ---------------Setting up Argo CD----------------
+
+    Setting up GitOps Repository 'https://github.com/IBM/sample-temperature-converter-gitops.git'
+    Kubernetes/OpenShift Namespace: test
+
+
+    Logging in to ArgoCD
+    'admin:login' logged in successfully
+    Context 'openshift-gitops-server-openshift-gitops.yourclustername-xxxx.us-south.containers.appdomain.cloud' updated
+
+    Setting up the ArgoCD application
+    application 'temperature-converter-app' created
+    Argo CD application setup completed
+
+    Successfully completed setting up GitOps Repository. Do you want to sync the Argo CD application? (y/n)
+    ```
+
+At this point, you have successfully setup the Argo CD application to point to your GitOps repository with the helm charts in it. You can now sync the Argo CD application by typing **y** in the terminal. The Argo CD application will sync with the source of truth that is the GitHub repository.
+
+```
+...
+
+Successfully completed setting up GitOps Repository. Do you want to sync the Argo CD application? (y/n)
+y
+Syncing the ArgoCD application...
+TIMESTAMP                  GROUP                            KIND    NAMESPACE                  NAME                     STATUS    HEALTH        HOOK  MESSAGE
+Name:               temperature-converter-app
+Project:            default
+Server:             https://kubernetes.default.svc
+Namespace:          test
+URL:                https://openshift-gitops-server-openshift-gitops.yourclustername-xxxx.us-south.containers.appdomain.cloud/applications/temperature-converter-app
+Repo:               https://github.com/IBM/sample-temperature-converter-gitops.git
+Target:             HEAD
+Path:               .
+SyncWindow:         Sync Allowed
+Sync Policy:        <none>
+Sync Status:        Synced to HEAD (c589a5f)
+Health Status:      Progressing
+
+Operation:          Sync
+Sync Revision:      c589a5f5fe7bce217a4290b76164f4f7594fb3ca
+Phase:              Succeeded
+Start:              2022-03-21 20:54:03 +0530 IST
+Finished:           2022-03-21 20:54:05 +0530 IST
+Duration:           2s
+Message:            successfully synced (all tasks run)
+
+GROUP                      KIND         NAMESPACE  NAME                                   STATUS  HEALTH  HOOK  MESSAGE
+rbac.authorization.k8s.io  RoleBinding  test       temperature-converter-app-rolebinding  Synced                rolebinding.rbac.authorization.k8s.io/temperature-converter-app-rolebinding reconciled. reconciliation required create
+                           missing subjects added:
+                                       {Kind:ServiceAccount APIGroup: Name:openshift-gitops-argocd-application-controller Namespace:openshift-gitops}. rolebinding.rbac.authorization.k8s.io/temperature-converter-app-rolebinding configured. Warning: resource rolebindings/temperature-converter-app-rolebinding is missing the kubectl.kubernetes.io/last-applied-configuration annotation which is required by  apply.  apply should only be used on resources created declaratively by either  create --save-config or  apply. The missing annotation will be patched automatically.
+                           Service     test  temperature-converter-app-service     Synced  Healthy           service/temperature-converter-app-service created
+apps                       Deployment  test  temperature-converter-app-deployment  Synced  Progressing       deployment.apps/temperature-converter-app-deployment created
+route.openshift.io         Route       test  temperature-converter-app-route       Synced  Healthy           route.route.openshift.io/temperature-converter-app-route created
+
+-------------Argo CD setup complete-------------
+```
+
 ### 3.3. View the ArgoCD Application
+
+You can view the Argo CD Application on the OpenShift console.
+
+* To view on the OpenShift console, login to your OpenShift cluster and navigate to the Red Hat Applications menu icon on top **menu → OpenShift GitOps → Cluster Argo CD**. The login page of the Argo CD UI is displayed in a new window.
+
+* Click on **Login with OpenShift** button.
+
+* You will see the Argo CD dashboard with the `temperature-converter-app` application that you synced in previous step.
+![ArgoCD-Dashboard](doc/source/images/argocd.png)
+
+* You can click on the **temperature-converter-app** application to view the details of the application.
+![ArgoCD-Application](doc/source/images/argo-app.png)
+
+* The **temperature-converter-app** application has the following resources deployed on the cluster:
+
+    Kind|Description
+    --|--
+    RBAC|Role Binding for the application. This allows Argo CD to access the namespace where the application is deployed.
+    Deployment|The deployment of the `temperature-converter-app` application.
+    Service|The service of the `temperature-converter-app` application.
+    Route|The OpenShift route of the `temperature-converter-app` application.
+
+If you have followed the code pattern upto this point correctly, you should be able to see the Application Health status as **Healthy**.
+
+At this point you have successfully setup the OpenShift GitOps as a continuous delivery (CD) mechanism for your application.
+
+## 4. Setup Trigger and Event Listener
+
+### 4.1. Create a Tekton Trigger for the Tekton Pipeline
+
+### 4.2. Add webhook to the source code repository
+
+## 5. Automated deployment of the application in action
+
+## Summary
 
 ## License
 
