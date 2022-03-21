@@ -57,7 +57,7 @@ We have created a Template Repository with a sample application. You can use the
 ![pat-scope](doc/source/images/pat-scope.png)
     >Note: Make sure to copy your personal access token when its generated. You won’t be able to see it later!
 
-#### About the application -
+#### About the application
 
 The app that you see in the repository is a simple temperature converter application built with NodeJS and Express framework.
 
