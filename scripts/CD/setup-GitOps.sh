@@ -10,12 +10,6 @@ echo "\033[1;34mSetting up GitOps Repository '$GITOPS_URL'\033[0m"
 NAMESPACE=$(oc config view --minify -o jsonpath='{..namespace}')
 echo "\033[1;37mKubernetes/OpenShift Namespace: $NAMESPACE\033[0m\n"
 
-echo "\033[1;34mSetting up RBAC roles for the namespace '$NAMESPACE'\033[0m"
-cd RBAC/
-oc apply -f rbac.yaml -n $NAMESPACE
-cd ../
-echo "\033[1;34mRBAC roles setup completed\033[0m\n"
-
 echo
 echo "\033[1;33mLogging in to ArgoCD\033[0m"
 argocd login $ARGOSERVER --insecure --username admin --password $ARGOPASSWORD

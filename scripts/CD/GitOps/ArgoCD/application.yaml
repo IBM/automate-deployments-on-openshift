@@ -5,7 +5,7 @@ metadata:
 spec:
   destination:
     name: ''
-    namespace: app-deployments
+    namespace: test
     server: https://kubernetes.default.svc
   project: default
   source:
