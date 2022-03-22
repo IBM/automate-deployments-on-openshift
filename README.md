@@ -48,10 +48,11 @@ Coming Soon!
     * 3.1. [Deploy OpenShift GitOps on the cluster](#31-deploy-open-shift-gitops-on-the-cluster)
     * 3.2. [Create ArgoCD Application](#32-create-argo-cd-application)
     * 3.3. [View the ArgoCD Application](#33-view-the-argo-cd-application)
-4. [Setup Trigger and Event Listener](#4-setup-trigger-and-event-listeners)
-    * 4.1. [Create a Tekton Trigger for the Tekton Pipeline](#41-create-a-tekton-trigger-for-the-tekton-pipeline)
-    * 4.2. [Add webhook to the source code repository](#42-add-webhook-to-the-source-code-repository)
-5. [Automated deployment of the application in action](#5-automated-deployment-of-the-application-in-action)
+4. [View the deployed application](#4-view-the-deployed-application)
+5. [Setup Trigger and Event Listener](#5-setup-trigger-and-event-listeners)
+    * 5.1. [Create a Tekton Trigger for the Tekton Pipeline](#51-create-a-tekton-trigger-for-the-tekton-pipeline)
+    * 5.2. [Add webhook to the source code repository](#52-add-webhook-to-the-source-code-repository)
+6. [Analyze the automated CI and CD](#6-analyze-the-automated-ci-and-cd)
 
 ## 1. Setup Repositories
 
@@ -353,7 +354,7 @@ You will learn how to deploy the Argo CD application on your OpenShift cluster. 
 
 * `destination` reference to the target cluster and namespace.
 
-* You will be referring to the `automate-deployments-on-openshift/scripts` directory from the cloned repository.
+You will be referring to the `automate-deployments-on-openshift/scripts` directory from the cloned repository.
 
 * The `scripts/CD/GitOps` directory consists of the Argo CD deployment config files.
     Files|Kind|Description
@@ -480,13 +481,99 @@ If you have followed the code pattern upto this point correctly, you should be a
 
 At this point you have successfully setup the OpenShift GitOps as a continuous delivery (CD) mechanism for your application.
 
-## 4. Setup Trigger and Event Listener
+## 4. View the deployed application
 
-### 4.1. Create a Tekton Trigger for the Tekton Pipeline
+Now that you have setup the CI and CD for your application and successfully run the CI pipeline and deployed the application with CD, you can view the deployed application.
 
-### 4.2. Add webhook to the source code repository
+* In the Argo CD Dashboard, click on the **Route** node and scroll down to find the **Host** URL of the **temperature-converter-app** application as shown.
 
-## 5. Automated deployment of the application in action
+    ![ArgoCD-Application-Route](doc/source/images/copy-host.gif)
+
+* Copy and paste the URL in a new browser window to view the application.
+
+    >Note: The url should have the `http://` prefix. `https://` is not supported.
+
+    ![sample-output](doc/source/images/sample-output.png)
+
+## 5. Setup Trigger and Event Listener
+
+A Tekton Trigger and Event Listener is required to automatically trigger the CI pipeline when there is code change in the GitHub source code repository and deploy the application with CD.
+
+### 5.1. Create a Tekton Trigger for the Tekton Pipeline
+
+A Tekton Trigger and EventListener can be created by following the steps below:
+
+* login to your OpenShift console and navigate to the **Pipelines > Pipelines** tab on the left panel.
+
+* Click on the three dots icon on your pipeline and select **Add Trigger** as shown.
+
+    ![add-trigger1](doc/source/images/add-trigger1.png)
+
+* You will see a window, you need to configure your Trigger with the following values:
+  * Under **Webhook** select the following:
+    * Git provider type: **github-push**
+  * Under **Parameters** add the following:
+    * git-url: **$(tt.params.git-repo-url)**
+    * git-rev: **$(tt.params.git-revision)**
+    * image-name: **CONTAINER_IMAGE_NAME that you used in [Step 2.2](#22-create-tekton-tasks-pipeline-and-secrets)**
+    * image-tag: **$(uid)**
+    * gitops-url: **GITOPS_URL that you created in [Step 1.2](#12-setup-gitops-repository)**
+  * Under **Workspace** select the following:
+    * doc-source: **Empty Directory**
+  * Preview of the window is shown below:
+    ![add-trigger](doc/source/images/add-trigger.png)
+  * Finally click on **Add**.
+
+* In your OpenShift console, navigate to the **Pipelines > Triggers** tab on the left panel.
+
+* Under **EventListerners** tab, select the event that just got created along with the trigger and copy the URL as shown.
+
+    ![copy-trigger-link](doc/source/images/copy-trigger-link.gif)
+
+**Note:** Copy the event listener URL as it will be used in the next step.
+
+At this point, you have successfully create a Tekton Trigger for the Tekton Pipeline. It can be triggered by the event listener.
+
+### 5.2. Add webhook to the source code repository
+
+Now that you have created a Tekton Trigger and EventListener, you will have to add the event listener URL as a webhook to your GitHub Source Code Repository so that the Tekton Pipeline is triggered on a git push event.
+
+Add the event listener URL as a webhook to your GitHub Source Code Repository by following the steps below:
+
+* Goto your source code repository created in [Step 1.1](#11-create-gitops-repository) and click on the **Settings** tab.
+
+* Goto the **Webhooks** tab on the left panel and click on the **Add webhook** button.
+
+* Add the following:
+  * Payload URL: **enter the event listener URL that you copied in [Step 5.1](#51-create-tekton-trigger-and-event-listener)**
+  * Content type: **application/json**
+  * Secret: \<leave blank\>
+  * Which events would you like to trigger the webhook?: **just the push event**
+  * Check the **Active** checkbox.
+  * Preview of the window is shown below:
+    ![add-webhook](doc/source/images/add-webhook.png)
+  * Finally click on **Add webhook**.
+
+If you have followed the code pattern upto this point correctly, you should be able to see a green tick icon beside the webhook URL.
+
+![webhook-set](doc/source/images/webhook-set.png)
+
+At this point you have successfully setup the OpenShift Pipeline Trigger on your GitHub Source Code Repository.
+
+## 6. Analyze the application
+
+You have successfully setup the following for your Temperature Converter Application:
+
+* **Source Code Repository** with a webhook to trigger the CI pipeline on a git push event
+* **CI pipeline on your OpenShift** to clone the repository, run the nodejs test cases, build the container image and push it to the container registry and finally update the configuration files in the GitOps Repository
+* **GitOps Repository consisting of Helm Chart** with the following resources definations:
+    * RBAC
+    * Deployment
+    * Service
+    * Route
+* **OpenShift GitOps (Argo CD) to deploy the helm chart** to your cluster
+
+Make some edit to your application code and push the changes to the source code repository. You will see the automated CI pipeline run and the application is deployed with CD.
 
 ## Summary
 
