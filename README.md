@@ -6,9 +6,11 @@ In this code pattern, you will learn how to create a continuous integration (CI)
 
 >Red Hat OpenShift GitOps is a declarative continuous delivery platform based on Argo CD.
 
-When you have completed this code pattern, you will understand how to:
+Once you complete the code pattern, you will learn to:
 
+* Use Tekton to build CI pipelines on OpenShift
 * Create a Continuous Integration (CI) mechanism for your cloud-native applications using OpenShift Pipeline
+* Use Argo CD as an declarative continuous delivery platform on OpenShift
 * Create a Continuous Delivery (CD) mechanism for your cloud-native applications using OpenShift GitOps
 * Setup an automation to build and deploy your cloud-native applications on a code change in your GitHub Repository
 
@@ -49,13 +51,13 @@ Coming Soon!
     * 2.3. [View the Tekton Pipeline](#23-view-the-tekton-pipeline)
 3. [Setup OpenShift GitOps Operator](#3-setup-open-shift-gitops-operator)
     * 3.1. [Deploy OpenShift GitOps on the cluster](#31-deploy-open-shift-gitops-on-the-cluster)
-    * 3.2. [Create ArgoCD Application](#32-create-argo-cd-application)
-    * 3.3. [View the ArgoCD Application](#33-view-the-argo-cd-application)
-4. [View the deployed application](#4-view-the-deployed-application)
+    * 3.2. [Create Argo CD Application](#32-create-argo-cd-application)
+    * 3.3. [View the Argo CD Dashboard](#33-view-the-argo-cd-dashboard)
+4. [View the Temperature converter Application](#4-view-the-temperature-converter-application)
 5. [Setup Trigger and Event Listener](#5-setup-trigger-and-event-listeners)
     * 5.1. [Create a Tekton Trigger for the Tekton Pipeline](#51-create-a-tekton-trigger-for-the-tekton-pipeline)
     * 5.2. [Add webhook to the source code repository](#52-add-webhook-to-the-source-code-repository)
-6. [Analyze the automated CI and CD](#6-analyze-the-automated-ci-and-cd)
+6. [Analyze the workflow](#6-analyze-the-workflow)
 
 ## 1. Setup Repositories
 
@@ -112,7 +114,7 @@ Tekton is a powerful and flexible Kubernetes-native open-source CI/CD framework,
 
 Open your OpenShift web console. Follow the instructions to deploy the OpenShift Pipeline Operator on your OpenShift cluster.
 
-* Goto **Operators > OperatorHub** and search for **OpenShift Pipeline**. Select the **Red Hat OpenShift Pipelines** operator.
+* Goto **Operators → OperatorHub** and search for **OpenShift Pipeline**. Select the **Red Hat OpenShift Pipelines** operator.
     ![openshift-pipeline](doc/source/images/operatorhub-pipeline.png)
 * Click on **Install** in the panel.
     ![pipeline-install](doc/source/images/pipeline-install.png)
@@ -201,14 +203,14 @@ You will learn how to deploy tekton tasks, pipelines and secrets using the `tkn`
 
 * The `scripts/setup-CI.sh` and `scripts/delete-CI.sh` scripts are used to setup and delete the CI environment.
 
-* The `scripts/setup-GitOps.sh` and `scripts/delete-GitOps.sh` scripts are used to setup and delete the GitOps Repository.
+* The `scripts/setup-GitOps.sh` and `scripts/delete-GitOps.sh` scripts are used to setup and delete the Application and its deployment configs on the cluster using the Argo CD Application CRD.
 
 * Before creating the Tekton Tasks, Pipeline and Secrets, you will need to export some environment variables that will be used by the shell script. Following are the environment variables that you need to export:
 
     Environment Variables|Description
     --|--
     GIT_URL|The Git URL of the GitHub repository created in [Step 1.1](#11-setup-source-code-repository).
-    GIT_BRANCH|The Git branch of the GitHub repository usually it is **Main**.
+    GIT_BRANCH|The Git branch of the GitHub repository usually it is **main**.
     GITOPS_URL|The Git URL of the GitOps repository created in [Step 1.2](#12-setup-gitops-repository).
     CONTAINER_IMAGE_NAME|The name of the container image that will be used to build container images and store them in the container registry. **Note: the container image name should be prefixed with your DockerHub username. Example: manojjahgirdar/automate-openshift-deployment**
     CONTAINER_IMAGE_TAG|The tag of the container image. **Example: 1.0**
@@ -332,7 +334,7 @@ Argo CD is a declarative, GitOps continuous delivery tool for Kubernetes.
 
 Open your OpenShift web console. Follow the instructions to deploy the OpenShift GitOps Operator on your OpenShift cluster.
 
-* Goto **Operators > OperatorHub** and search for **OpenShift GitOps**. Select the **Red Hat OpenShift GitOps** operator.
+* Goto **Operators → OperatorHub** and search for **OpenShift GitOps**. Select the **Red Hat OpenShift GitOps** operator.
     ![openshift-pipeline](doc/source/images/operatorhub-gitops.png)
 * Click on **Install** in the panel.
     ![pipeline-install](doc/source/images/gitops-install.png)
@@ -352,7 +354,10 @@ At this point you have successfully deployed OpenShift GitOps on your OpenShift 
 
 ![pipelines-tab](doc/source/images/argocd-tab.png)
 
-### 3.2. Create ArgoCD Application
+### 3.2. Create Argo CD Application
+
+>Note: You need to be connected to your OpenShift cluster from the OC CLI to create Argo CD Application.
+> Open the OpenShift web console for your cluster. To log in to your cluster from the CLI, in the OpenShift console, click on the logged in user ID on the top right and select **Copy Login Command**, then run the `oc login` command in a terminal.
 
 You will learn how to deploy the Argo CD application on your OpenShift cluster. The Application CRD is the Kubernetes resource object representing a deployed application instance in an environment. It is defined by two key pieces of information:
 
@@ -366,8 +371,6 @@ You will be referring to the `automate-deployments-on-openshift/scripts` directo
     Files|Kind|Description
     --|--|--
     **ArgoCD/application.yaml**|Argo CD Application| This is the Argo CD application definition.
-
-* The `scripts/setup-CI.sh` and `scripts/delete-CI.sh` scripts are used to setup and delete the CI environment.
 
 * The `scripts/setup-GitOps.sh` and `scripts/delete-GitOps.sh` scripts are used to setup and delete the Application and its deployment configs on the cluster using the Argo CD Application CRD.
 
@@ -460,9 +463,9 @@ route.openshift.io         Route       test  temperature-converter-app-route    
 -------------Argo CD setup complete-------------
 ```
 
-### 3.3. View the ArgoCD Application
+### 3.3. View the Argo CD Dashboard
 
-You can view the Argo CD Application on the OpenShift console.
+You can view the Argo CD Dashboard on the OpenShift console.
 
 * To view on the OpenShift console, login to your OpenShift cluster and navigate to the Red Hat Applications menu icon on top **menu → OpenShift GitOps → Cluster Argo CD**. The login page of the Argo CD UI is displayed in a new window.
 
@@ -487,7 +490,7 @@ If you have followed the code pattern upto this point correctly, you should be a
 
 At this point you have successfully setup the OpenShift GitOps as a continuous delivery (CD) mechanism for your application.
 
-## 4. View the deployed application
+## 4. View the Temperature converter Application
 
 Now that you have setup the CI and CD for your application and successfully run the CI pipeline and deployed the application with CD, you can view the deployed application.
 
@@ -509,7 +512,7 @@ A Tekton Trigger and Event Listener is required to automatically trigger the CI 
 
 A Tekton Trigger and EventListener can be created by following the steps below:
 
-* login to your OpenShift console and navigate to the **Pipelines > Pipelines** tab on the left panel.
+* login to your OpenShift console and navigate to the **Pipelines → Pipelines** tab on the left panel.
 
 * Click on the three dots icon on your pipeline and select **Add Trigger** as shown.
 
@@ -520,7 +523,7 @@ A Tekton Trigger and EventListener can be created by following the steps below:
     * Git provider type: **github-push**
   * Under **Parameters** add the following:
     * git-url: **$(tt.params.git-repo-url)**
-    * git-rev: **$(tt.params.git-revision)**
+    * git-rev: **GIT_BRANCH that you used in [Step 2.2](#22-create-tekton-tasks-pipeline-and-secrets)** (usually **main**)
     * image-name: **CONTAINER_IMAGE_NAME that you used in [Step 2.2](#22-create-tekton-tasks-pipeline-and-secrets)**
     * image-tag: **$(uid)**
     * gitops-url: **GITOPS_URL that you created in [Step 1.2](#12-setup-gitops-repository)**
@@ -566,7 +569,7 @@ If you have followed the code pattern upto this point correctly, you should be a
 
 At this point you have successfully setup the OpenShift Pipeline Trigger on your GitHub Source Code Repository.
 
-## 6. Analyze the application
+## 6. Analyze the workflow
 
 You have successfully setup the following for your Temperature Converter Application:
 
