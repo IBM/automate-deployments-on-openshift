@@ -46,10 +46,12 @@ Once you complete the code pattern, you will learn to:
 
 1. User checks in the code to the source control repository
 2. GitHub webhook triggers an OpenShift Pipeline on the push event
-3. First Tekton CI task runs to clone the code from the GitHub repository
-4. Second Tekton CI task runs to build the container image from the source code. The image is then pushed to the container registry
-5. Third Tekton CI task runs to update the deployment configuration with the new image and store the configuration files in the GitOps repository
-6. The OpenShift GitOps picks up the configuration files from the GitOps repository and deploys to the OpenShift cluster
+3. The first Tekton CI task runs to clone the code from the GitHub repository
+4. Then the second Tekton CI task runs to build and run the test cases for the application
+5. The third Tekton CI task runs to build the container image from the source code. The image is then pushed to the container registry
+6. The final Tekton CI task runs to update the deployment configuration with the new image.
+7. The configuration files are stored in the GitOps repository
+8. The OpenShift GitOps picks up the configuration files from the GitOps repository and deploys the resources to the OpenShift cluster
 
 # Instructions
 
