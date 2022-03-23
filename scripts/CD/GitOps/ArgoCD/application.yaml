@@ -5,12 +5,12 @@ metadata:
 spec:
   destination:
     name: ''
-    namespace: test
+    namespace: ''
     server: https://kubernetes.default.svc
   project: default
   source:
     path: .
-    repoURL: https://github.com/IBM/sample-temperature-converter-gitops.git
+    repoURL: ''
     targetRevision: HEAD
   syncPolicy:
     syncOptions:
