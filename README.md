@@ -1,13 +1,16 @@
-# Automate OpenShift Deployments using Tekton CI and Argo CD
+# Automate cloud-native application using OpenShift Pipeline and OpenShift GitOps Operators
 
-In this code pattern, we will [create something] using [technologies] and [components]. [Explain briefly how things work]. [Give acknowledgements to others if necessary]
+In this code pattern, you will learn how to create a continuous integration (CI) and a continuous delivery (CD) mechanism for your cloud-native applications using Red Hat OpenShift Pipeline and Red Hat OpenShift GitOps Operators. You will learn how to use Red Hat OpenShift Pipeline to create a pipeline that will build and test your application, build container image for your application and push it to container registry and update the configuration files in the GitOps repository. You will also learn how these configuration files are taken from the GitOps repository and resources are created accordingly on the OpenShift cluster using Red Hat OpenShift GitOps.
+
+>Red Hat OpenShift Pipelines is a cloud-native continuous integration and delivery (CI/CD) solution for building pipelines using Tekton.
+
+>Red Hat OpenShift GitOps is a declarative continuous delivery platform based on Argo CD.
 
 When you have completed this code pattern, you will understand how to:
 
-* [goal 1]
-* [goal 2]
-* [goal 3]
-* [goal 4]
+* Create a Continuous Integration (CI) mechanism for your cloud-native applications using OpenShift Pipeline
+* Create a Continuous Delivery (CD) mechanism for your cloud-native applications using OpenShift GitOps
+* Setup an automation to build and deploy your cloud-native applications on a code change in your GitHub Repository
 
 <!--add an image in this path-->
 ![architecture](doc/source/images/architecture.png)
@@ -127,9 +130,12 @@ Open your OpenShift web console. Follow the instructions to deploy the OpenShift
 
 At this point you have successfully deployed OpenShift Pipelines on your OpenShift cluster. A new **Pipelines** tab will appear on the left panel of the OpenShift web console under **Administrator** view as shown.
 
-><img src="doc/source/images/pipelines-tab.png" width="30%" height="50%" />
+<img src="doc/source/images/pipelines-tab.png" width="30%" height="50%" />
 
 ### 2.2. Create Tekton Tasks, Pipeline and Secrets
+
+>Note: You need to be connected to your OpenShift cluster from the OC CLI to create Tekton resources.
+> Open the OpenShift web console for your cluster. To log in to your cluster from the CLI, in the OpenShift console, click on the logged in user ID on the top right and select **Copy Login Command**, then run the `oc login` command in a terminal.
 
 You will learn how to deploy tekton tasks, pipelines and secrets using the `tkn` commandline tool. You will refer to the deployment config files from this repository. Follow the instructions to create the Tekton Tasks, Pipeline and Secrets.
 
@@ -344,7 +350,7 @@ Open your OpenShift web console. Follow the instructions to deploy the OpenShift
 
 At this point you have successfully deployed OpenShift GitOps on your OpenShift cluster. **Cluster Argo CD** will appear on top **menu** as shown.
 
->![pipelines-tab](doc/source/images/argocd-tab.png)
+![pipelines-tab](doc/source/images/argocd-tab.png)
 
 ### 3.2. Create ArgoCD Application
 
@@ -576,6 +582,8 @@ You have successfully setup the following for your Temperature Converter Applica
 Make some edit to your application code and push the changes to the source code repository. You will see the automated CI pipeline run and the application is deployed with CD.
 
 ## Summary
+
+In this code pattern, you learned how to setup a Continuous Integration (CI) and Continuous Delivery (CD) mechanism for your application using OpenShift Pipeline and GitOps. Learn more about Creating CI/CD solutions for applications using OpenShift Pipelines [here](https://docs.openshift.com/container-platform/4.9/cicd/pipelines/creating-applications-with-cicd-pipelines.html).
 
 ## License
 
