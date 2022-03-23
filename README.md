@@ -1,4 +1,4 @@
-# Automate cloud-native application using OpenShift Pipeline and OpenShift GitOps Operators
+# Automate cloud-native application lifecycle using OpenShift Pipeline and OpenShift GitOps Operators
 
 In this code pattern, you will learn how to create a continuous integration (CI) and a continuous delivery (CD) mechanism for your cloud-native applications using Red Hat OpenShift Pipeline and Red Hat OpenShift GitOps Operators. You will learn how to use Red Hat OpenShift Pipeline to create a pipeline that will build and test your application, build container image for your application and push it to container registry and update the configuration files in the GitOps repository. You will also learn how these configuration files are taken from the GitOps repository and resources are created accordingly on the OpenShift cluster using Red Hat OpenShift GitOps.
 
