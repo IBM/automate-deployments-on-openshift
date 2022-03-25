@@ -47,16 +47,16 @@ Coming Soon!
     * 1.1. [Setup source code repository](#11-setup-source-code-repository)
     * 1.2. [Setup GitOps repository](#12-setup-gitops-repository)
     * 1.3. [Setup container registry](#13-setup-container-registry)
-2. [Setup OpenShift Pipeline Operator](#2-setup-open-shift-pipeline-operator)
-    * 2.1. [Deploy OpenShift Pipeline on the cluster](#21-deploy-open-shift-pipeline-on-the-cluster)
+2. [Setup OpenShift Pipeline Operator](#2-setup-openshift-pipeline-operator)
+    * 2.1. [Deploy OpenShift Pipeline on the cluster](#21-deploy-openshift-pipeline-on-the-cluster)
     * 2.2. [Create Tekton Tasks, Pipeline and Secrets](#22-create-tekton-tasks-pipeline-and-secrets)
     * 2.3. [View the Tekton Pipeline](#23-view-the-tekton-pipeline)
-3. [Setup OpenShift GitOps Operator](#3-setup-open-shift-gitops-operator)
-    * 3.1. [Deploy OpenShift GitOps on the cluster](#31-deploy-open-shift-gitops-on-the-cluster)
+3. [Setup OpenShift GitOps Operator](#3-setup-openshift-gitops-operator)
+    * 3.1. [Deploy OpenShift GitOps on the cluster](#31-deploy-openshift-gitops-on-the-cluster)
     * 3.2. [Create Argo CD Application](#32-create-argo-cd-application)
     * 3.3. [View the Argo CD Dashboard](#33-view-the-argo-cd-dashboard)
 4. [View the Temperature converter Application](#4-view-the-temperature-converter-application)
-5. [Setup Trigger and Event Listener](#5-setup-trigger-and-event-listeners)
+5. [Setup Trigger and Event Listener](#5-setup-trigger-and-event-listener)
     * 5.1. [Create a Tekton Trigger for the Tekton Pipeline](#51-create-a-tekton-trigger-for-the-tekton-pipeline)
     * 5.2. [Add webhook to the source code repository](#52-add-webhook-to-the-source-code-repository)
 6. [Analyze the workflow](#6-analyze-the-workflow)
@@ -67,7 +67,11 @@ Coming Soon!
 
 We have created a Template Repository with a sample application. You can use the sample application to complete this code pattern.
 
-* Create a repository with [this template on GitHub](https://github.com/IBM/sample-temperature-converter-app/generate). It can be a public or private Repository.
+GitHub Code Repository Template|
+--|
+[![Use this template](https://user-images.githubusercontent.com/52746337/160120439-ab1e6eb7-f4ba-4f57-bb0c-9f048cd5fe83.png)](https://github.com/IBM/sample-temperature-converter-app/generate)
+
+* Create a repository with the template. It can be a public or private Repository.
 * Once the repository is created, create a [Personal Access Token](https://github.com/settings/tokens/new) with scope=`public_repo` if its a public repository or scope=`repo` if its a private repository.
 ![pat-scope](doc/source/images/pat-scope.png)
     >Note: Make sure to copy your personal access token when its generated. You won’t be able to see it later!
@@ -84,7 +88,11 @@ The app that you see in the repository is a simple temperature converter applica
 
 We have created a Template Repository with Helm chart for the sample application. You can use the Helm chart for the sample application to complete this code pattern.
 
-* Create a GitOps repository with [this template on GitHub](https://github.com/IBM/sample-temperature-converter-gitops/generate). It can be a public or private Repository.
+GitHub GitOps Repository Template|
+--|
+[![Use this template](https://user-images.githubusercontent.com/52746337/160120439-ab1e6eb7-f4ba-4f57-bb0c-9f048cd5fe83.png)](https://github.com/IBM/sample-temperature-converter-gitops/generate)
+
+* Create a GitOps repository with the template. It can be a public or private Repository.
     > Note: The same personal access token that you created above will be used to access the GitOps repository.
 
 **Note:** Copy the GitHub GitOps repository url as it will be used in the subsequent steps.
