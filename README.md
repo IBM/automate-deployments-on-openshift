@@ -590,7 +590,9 @@ You have successfully setup the following for your Temperature Converter Applica
     * Deployment
     * Service
     * Route
-* **OpenShift GitOps (Argo CD) to deploy the helm chart** to your cluster
+* **OpenShift GitOps (Argo CD) will deploy the helm chart** to your cluster
+
+![flow](doc/source/images/flow.png)
 
 Make some edit to your application code and push the changes to the source code repository. You will see the automated CI pipeline run and the application is deployed with CD.
 
